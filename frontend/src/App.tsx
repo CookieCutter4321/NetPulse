@@ -8,7 +8,8 @@ function App() {
 
   const [messages, setMessages] = useState([
     { id: 1, text: "Hey! Welcome to GoChat.", sender: "system" },
-    { id: 2, text: "Type a message below to test the layout.", sender: "system" },
+    { id: 2, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", sender: "system" },
+    { id: 3, text: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", sender: "user"}
   ])
 
 const handleSend = (e: React.SubmitEvent) => {
@@ -27,18 +28,28 @@ const handleSend = (e: React.SubmitEvent) => {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${
-                  msg.sender === "user"
-                    ? "bg-slate-900 text-white"
-                    : "bg-slate-100 text-slate-800"
-                }`}
+            <div>
+            <div className={`flex w-full mb-1 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+              <span 
+                className={`text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase px-1`}
               >
-                {msg.text}
+                {msg.sender}
+              </span>
+            </div>
+
+              <div
+                key={msg.id}
+                className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+              >
+                  <div
+                    className={`max-w-[75%] wrap-break-words rounded-lg px-3 py-2 text-sm ${
+                      msg.sender === "user"
+                        ? "bg-slate-900 text-white"
+                        : "bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
               </div>
             </div>
           ))}
