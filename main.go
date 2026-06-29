@@ -12,7 +12,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var connections = []*websocket.Conn{}
+var connections = make(map[*websocket.Conn]struct{})
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -21,7 +21,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	connections = append(connections, conn)
+	connections[conn] = struct{}{}
 
 	for {
 		messageType, p, err := conn.ReadMessage()
@@ -30,12 +30,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		for i := 0; i < len(connections); i++ {
-			var currentConn *websocket.Conn = connections[i]
-
+		for currentConn, _ := range connections {
 			if err := currentConn.WriteMessage(messageType, p); err != nil {
 				log.Println(err)
-				return
+				delete(connections, currentConn)
 			}
 		}
 	}
