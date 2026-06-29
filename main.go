@@ -30,7 +30,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		for currentConn, _ := range connections {
+		for currentConn := range connections {
 			if err := currentConn.WriteMessage(messageType, p); err != nil {
 				log.Println(err)
 				delete(connections, currentConn)
