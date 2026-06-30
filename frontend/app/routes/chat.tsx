@@ -22,7 +22,7 @@ const handleSend = (e: React.SubmitEvent) => {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
-      <Card className="flex h-125 w-125 flex-col shadow-lg bg-white">
+      <Card className="flex h-full max-h-125 w-full max-w-125 flex-col shadow-lg bg-white">
         <CardHeader className="border-b p-4">
           <CardTitle className="text-lg font-semibold text-slate-800">GoChat Room</CardTitle>
         </CardHeader>
