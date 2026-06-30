@@ -2,12 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from "path"
 import tailwindcss from '@tailwindcss/vite'
+import { reactRouter } from '@react-router/dev/vite'
+import { fileURLToPath } from 'node:url'
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), reactRouter()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./"), // Points to the frontend root instead of ./src
+      "@": fileURLToPath(new URL('./app', import.meta.url))
     },
   }
 })

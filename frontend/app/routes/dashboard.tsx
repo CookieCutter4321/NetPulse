@@ -1,9 +1,9 @@
 import { useState } from "react"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-
-function App() {
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
+import { Input } from "@/components/input"
+import { Button } from "@/components/button"
+  
+function dashboard() {
   const [input, setInput] = useState("")
 
   const [messages, setMessages] = useState([
@@ -77,4 +77,4 @@ const handleSend = (e: React.SubmitEvent) => {
 
 }
 
-export default App
+export default dashboard
