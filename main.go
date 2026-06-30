@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -35,14 +36,22 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
-			return
+			continue
+		}
+
+		var msg message
+		err2 := json.Unmarshal(p, &msg)
+
+		if err2 != nil {
+			log.Println(err)
+			continue
 		}
 
 		for currentConn := range connections {
 			payload := message{
 				Id:     time.Now().UnixMilli(),
-				Msg:    string(p),
-				Sender: "user", // In the future, payloads to this websocket will be in json and so will need rewrite.
+				Msg:    msg.Msg,
+				Sender: msg.Sender, // In the future, payloads to this websocket will be in json and so will need rewrite.
 			}
 
 			if err := currentConn.WriteJSON(payload); err != nil {
