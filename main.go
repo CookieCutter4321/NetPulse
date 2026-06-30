@@ -4,12 +4,20 @@ import (
 	"log"
 	"net/http"
 
+	"time"
+
 	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+}
+
+type message struct {
+	Id     int64
+	Msg    string
+	Sender string
 }
 
 var connections = make(map[*websocket.Conn]struct{})
@@ -24,14 +32,20 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	connections[conn] = struct{}{}
 
 	for {
-		messageType, p, err := conn.ReadMessage()
+		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
 		}
 
 		for currentConn := range connections {
-			if err := currentConn.WriteMessage(messageType, p); err != nil {
+			payload := message{
+				Id:     time.Now().UnixMilli(),
+				Msg:    string(p),
+				Sender: "user", // In the future, payloads to this websocket will be in json and so will need rewrite.
+			}
+
+			if err := currentConn.WriteJSON(payload); err != nil {
 				log.Println(err)
 				delete(connections, currentConn)
 			}
