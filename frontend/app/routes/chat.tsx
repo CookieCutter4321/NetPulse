@@ -28,7 +28,7 @@ const handleSend = (e: React.SubmitEvent) => {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((msg) => (
-            <div>
+            <div key={msg.id}>
             <div className={`flex w-full mb-1 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
               <span 
                 className={`text-[11px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase px-1`}
@@ -38,7 +38,6 @@ const handleSend = (e: React.SubmitEvent) => {
             </div>
 
               <div
-                key={msg.id}
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                   <div
