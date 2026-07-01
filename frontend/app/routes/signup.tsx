@@ -17,6 +17,10 @@ export default function LoginCard() {
         const password = target.password.value;
         const confirmPassword = target.confirmPassword.value;
 
+        if (!username || !password || !confirmPassword) {
+            alert("Incomplete fields")
+            return;
+        }
         if (password !== confirmPassword) {
         alert("Passwords do not match!");
         return;
