@@ -56,7 +56,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 			payload := message{
 				Id:     time.Now().UnixMilli(),
 				Msg:    msg.Msg,
-				Sender: msg.Sender, // In the future, payloads to this websocket will be in json and so will need rewrite.
+				Sender: msg.Sender,
 			}
 
 			if err := currentConn.WriteJSON(payload); err != nil {
