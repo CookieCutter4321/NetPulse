@@ -10,5 +10,6 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL('./app', import.meta.url))
     },
-  }
+  },
+  // eventually we will need to set up a proxy for communicating with go
 })
