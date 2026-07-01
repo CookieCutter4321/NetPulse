@@ -1,4 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/card";
+import { Link } from 'react-router'
 
 export default function LoginCard() {
   return (
@@ -57,6 +58,16 @@ export default function LoginCard() {
             </svg>
             Google
           </button>
+          {/* Add this right below the Google button container */}
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Don't have an account?{' '}
+            <Link 
+              to="/signup" 
+              className="font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>
