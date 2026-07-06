@@ -28,6 +28,7 @@ type message struct {
 
 var connections = make(map[*websocket.Conn]struct{})
 
+// todo: use channels to handle the message sends concurrently
 func chatHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -94,6 +95,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write(indexHTML)
 	})
+
+	http.HandleFunc("/api/auth", handleAuth)
 
 	log.Println("NetPulse server launching on http://localhost:8080")
 	err = http.ListenAndServe("localhost:8080", nil)
