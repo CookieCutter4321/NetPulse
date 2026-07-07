@@ -79,7 +79,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			if err == sql.ErrNoRows {
-				fmt.Println("User not found")
+				http.Error(w, "User not found", http.StatusBadRequest)
 				return
 			}
 			log.Fatal(err)
@@ -94,11 +94,11 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(loginInfo.Password))
 
 		if err != nil {
-			fmt.Println("Invalid password!")
+			http.Error(w, "Invalid password!", http.StatusBadRequest)
 			return
 		}
-		log.Println("Logged in successfully")
-
+		log.Println("Logged in successfully!")
+		handleSuccessfulLogin(w, username)
 	} else {
 		// create an account
 		bytes, err := bcrypt.GenerateFromPassword([]byte(loginInfo.Password), bcrypt.DefaultCost)

@@ -1,6 +1,41 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/card";
 import { Link } from 'react-router'
 
+type UserLogin = {
+    Username: string;
+    Password: string;
+    AuthProvider: string | null;
+    IsLogin: boolean;
+};
+
+async function handleLogin(username: string, password: string, authProvider: string | null) {
+  const payload: UserLogin = {
+    Username: username,
+    Password: password,
+    AuthProvider: authProvider,
+    IsLogin: true
+  }
+
+  try {
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Authentication failed:", errorText);
+      alert(`Error: ${errorText}`);
+      return;
+    }
+  } catch (error) {
+    console.error("Network error:", error)
+  }
+}
+
 export default function LoginCard() {
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
@@ -10,11 +45,12 @@ export default function LoginCard() {
         </CardHeader>
         
         <CardContent className="flex-1 flex flex-col justify-center space-y-4 px-6 pb-8">
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={(e) => {e.preventDefault(); handleLogin(e.currentTarget.username.value,e.currentTarget.password.value, null)}}>
             <div className="space-y-1">
               <label className="text-sm font-medium text-slate-600" htmlFor="username">Username or Email</label>
               <input 
                 id="username"
+                name="username"
                 type="text" 
                 placeholder="Enter your username" 
                 className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -25,6 +61,7 @@ export default function LoginCard() {
               <label className="text-sm font-medium text-slate-600" htmlFor="password">Password</label>
               <input 
                 id="password"
+                name="password"
                 type="password" 
                 placeholder="••••••••" 
                 className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
