@@ -38,6 +38,21 @@ var jwtKey []byte
 
 // todo: use channels to handle the message sends concurrently
 func chatHandler(w http.ResponseWriter, r *http.Request) {
+	// When the user first connects, check if the cookie is valid first
+	cookie, err := r.Cookie("chat_session")
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := validateJWT(cookie.Value)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	username := claims.Username
+
+	// Upgrade to a websocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -65,7 +80,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 			payload := message{
 				Id:     time.Now().UnixMilli(),
 				Msg:    msg.Msg,
-				Sender: msg.Sender,
+				Sender: username,
 			}
 
 			if err := currentConn.WriteJSON(payload); err != nil {
