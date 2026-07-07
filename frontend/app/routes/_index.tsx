@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/card";
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 type UserLogin = {
     Username: string;
@@ -8,35 +8,37 @@ type UserLogin = {
     IsLogin: boolean;
 };
 
-async function handleLogin(username: string, password: string, authProvider: string | null) {
-  const payload: UserLogin = {
-    Username: username,
-    Password: password,
-    AuthProvider: authProvider,
-    IsLogin: true
-  }
-
-  try {
-    const response = await fetch('/api/auth', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Authentication failed:", errorText);
-      alert(`Error: ${errorText}`);
-      return;
-    }
-  } catch (error) {
-    console.error("Network error:", error)
-  }
-}
-
 export default function LoginCard() {
+  const navigate = useNavigate();
+
+  async function handleLogin(username: string, password: string, authProvider: string | null) {
+    const payload: UserLogin = {
+      Username: username,
+      Password: password,
+      AuthProvider: authProvider,
+      IsLogin: true
+    }
+
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Authentication failed:", errorText);
+        alert(`Error: ${errorText}`);
+        return;
+      }
+      navigate("/chat")
+    } catch (error) {
+      console.error("Network error:", error)
+    }
+  }
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
       <Card className="flex h-full max-h-125 w-full max-w-125 flex-col shadow-lg bg-white justify-between">
