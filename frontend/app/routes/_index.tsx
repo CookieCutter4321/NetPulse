@@ -1,5 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/card";
 import { Link, useNavigate } from 'react-router'
+import { useAuth } from "@/components/authContext"
+import { useEffect } from "react";
 
 type UserLogin = {
     Username: string;
@@ -10,6 +12,14 @@ type UserLogin = {
 
 export default function LoginCard() {
   const navigate = useNavigate();
+
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated === true) {
+      navigate("/chat");
+    }
+  }, [isAuthenticated, navigate]);
 
   async function handleLogin(username: string, password: string, authProvider: string | null) {
     const payload: UserLogin = {

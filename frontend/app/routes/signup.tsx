@@ -1,8 +1,17 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/card";
 import { useNavigate } from 'react-router';
+import { useAuth } from "@/components/authContext"
+import { useEffect } from "react";
 
 export default function LoginCard() {
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+
+    useEffect(() => {
+      if (isAuthenticated === true) {
+        navigate("/chat");
+      }
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault(); // Stop the page from reloading

@@ -1,6 +1,6 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import "./index.css"; 
-
+import { AuthProvider } from "@/components/authContext"
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -11,7 +11,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <AuthProvider>
         {children}
+        </AuthProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

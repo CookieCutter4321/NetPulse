@@ -1,9 +1,20 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Input } from "@/components/input"
 import { Button } from "@/components/button"
-  
+import { useAuth } from "@/components/authContext"
+import { useNavigate } from "react-router"
+
 function chat() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
   const [input, setInput] = useState("")
 
   const [messages, setMessages] = useState([
