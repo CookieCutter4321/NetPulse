@@ -9,7 +9,13 @@ import (
 	"strings"
 	"time"
 
+	"database/sql"
+
+	"os"
+
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 //go:embed all:frontend/build/client/*
@@ -27,6 +33,7 @@ type message struct {
 }
 
 var connections = make(map[*websocket.Conn]struct{})
+var db *sql.DB
 
 // todo: use channels to handle the message sends concurrently
 func chatHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,6 +76,9 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	godotenv.Load()
+
+	// serve frontend assets
 	distFS, err := fs.Sub(frontendAssets, "frontend/build/client")
 	if err != nil {
 		log.Fatal("Failed to parse embedded client folder:", err)
@@ -95,6 +105,18 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write(indexHTML)
 	})
+	// set up database access
+	db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Database unreachable: %v", err)
+	}
+	log.Println("Successfully connected to database")
 
 	http.HandleFunc("/api/auth", handleAuth)
 
