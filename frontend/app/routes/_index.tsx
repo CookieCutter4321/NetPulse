@@ -13,7 +13,7 @@ type UserLogin = {
 export default function LoginCard() {
   const navigate = useNavigate();
 
-  const { isAuthenticated } = useAuth();
+  const { checkAuth, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated === true) {
@@ -44,7 +44,9 @@ export default function LoginCard() {
         alert(`Error: ${errorText}`);
         return;
       }
-      navigate("/chat")
+      await checkAuth();
+
+      navigate("/chat") 
     } catch (error) {
       console.error("Network error:", error)
     }
