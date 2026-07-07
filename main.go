@@ -34,6 +34,7 @@ type message struct {
 
 var connections = make(map[*websocket.Conn]struct{})
 var db *sql.DB
+var jwtKey []byte
 
 // todo: use channels to handle the message sends concurrently
 func chatHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,6 +118,7 @@ func main() {
 		log.Fatalf("Database unreachable: %v", err)
 	}
 	log.Println("Successfully connected to database")
+	jwtKey = []byte(os.Getenv("JWT_TOKEN"))
 
 	http.HandleFunc("/api/auth", handleAuth)
 

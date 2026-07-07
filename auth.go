@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,6 +17,41 @@ type userLogin struct {
 	Password     string
 	AuthProvider string
 	IsLogin      bool
+}
+type Claims struct {
+	Username string `json:"username"`
+	jwt.RegisteredClaims
+}
+
+func handleSuccessfulLogin(w http.ResponseWriter, username string) {
+
+	expirationTime := time.Now().Add(24 * time.Hour)
+
+	claims := &Claims{
+		Username: username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "chat_session",
+		Value:    tokenString,
+		Expires:  expirationTime,
+		HttpOnly: true,
+		Secure:   false,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	fmt.Fprintln(w, "Session created successfully!")
 }
 
 // /api/auth
@@ -47,6 +84,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 			}
 			log.Fatal(err)
 		}
+
 		if loginInfo.AuthProvider != "" {
 			log.Println("Auth login will be added soon")
 			return
