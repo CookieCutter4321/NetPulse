@@ -23,6 +23,12 @@ function chat() {
   ])
   
   const socketRef = useRef<WebSocket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   useEffect(() => {
     const wsUrl = `ws://${window.location.host}/api/chat`;
     const socket = new WebSocket(wsUrl);
@@ -56,9 +62,6 @@ function chat() {
     }
   };
 
-
-
-  
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
       <Card className="flex h-full max-h-125 w-full max-w-125 flex-col shadow-lg bg-white">
@@ -91,6 +94,7 @@ function chat() {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </CardContent>
 
         <CardFooter className="border-t p-4">
@@ -109,10 +113,8 @@ function chat() {
         </CardFooter>
 
       </Card>
-
     </div>
   )
-
 }
 
 export default chat
