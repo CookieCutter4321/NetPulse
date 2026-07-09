@@ -13,7 +13,7 @@ export default function LoginCard() {
       }
     }, [isAuthenticated, navigate]);
 
-    const handleSubmit = (e: React.SyntheticEvent) => {
+    const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault(); // Stop the page from reloading
 
         const target = e.target as typeof e.target & {
@@ -34,7 +34,21 @@ export default function LoginCard() {
         alert("Passwords do not match!");
         return;
         }
-        console.log("Submitting:", { username, password });
+
+        const accountInfo = {
+          Username: username,
+          Password: password,
+          IsLogin: false
+        }
+        console.log("Submitting:", JSON.stringify(accountInfo));
+        await fetch('/api/auth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(accountInfo)
+        });
+
         navigate('/')
     };
 
