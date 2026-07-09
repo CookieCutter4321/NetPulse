@@ -13,6 +13,8 @@ import (
 
 	"os"
 
+	"sync"
+
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -33,6 +35,8 @@ type message struct {
 }
 
 var connections = make(map[*websocket.Conn]struct{})
+var connectionsMu sync.Mutex
+
 var db *sql.DB
 var jwtKey []byte
 
@@ -59,23 +63,31 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	connectionsMu.Lock()
 	connections[conn] = struct{}{}
+	connectionsMu.Unlock()
 
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
-			continue
+
+			connectionsMu.Lock()
+			delete(connections, conn)
+			connectionsMu.Unlock()
+
+			conn.Close()
+			break
 		}
 
 		var msg message
 		err2 := json.Unmarshal(p, &msg)
 
 		if err2 != nil {
-			log.Println(err)
+			log.Println(err2)
 			continue
 		}
-
+		connectionsMu.Lock()
 		for currentConn := range connections {
 			payload := message{
 				Id:     time.Now().UnixMilli(),
@@ -88,6 +100,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 				delete(connections, currentConn)
 			}
 		}
+		connectionsMu.Unlock()
 	}
 }
 
