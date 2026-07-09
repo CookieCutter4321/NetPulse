@@ -24,6 +24,7 @@ function chat() {
   
   const socketRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const uploadFileRef = useRef< HTMLInputElement | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -110,6 +111,10 @@ function chat() {
               Send
             </Button>
           </form>
+             <label htmlFor="file-upload">
+              Upload file
+            </label>
+            <input id="file-upload" title = " " type="file" ref = {uploadFileRef}/>
         </CardFooter>
 
       </Card>
