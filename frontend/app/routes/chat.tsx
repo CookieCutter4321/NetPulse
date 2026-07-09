@@ -63,6 +63,10 @@ function chat() {
     }
   };
 
+  const handleFileUpload = () => {
+    var files = uploadFileRef.current?.files
+    // TODO
+  }
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
       <Card className="flex h-full max-h-125 w-full max-w-125 flex-col shadow-lg bg-white">
@@ -114,7 +118,7 @@ function chat() {
              <label htmlFor="file-upload">
               Upload file
             </label>
-            <input id="file-upload" title = " " type="file" ref = {uploadFileRef}/>
+            <input id="file-upload" title = " " type="file" ref = {uploadFileRef} onChange={handleFileUpload}/>
         </CardFooter>
 
       </Card>
