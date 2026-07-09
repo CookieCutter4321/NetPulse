@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean | null;
+  username: String
   checkAuth: () => Promise<void>;
 }
 
@@ -10,9 +11,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [username, setUsername] = useState<String>("");
 
   const checkAuth = async () => {
     const res = await fetch("/api/auth/check");
+    setUsername(await res.text())
     setIsAuthenticated(res.ok);
   };
 
@@ -21,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, checkAuth }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
