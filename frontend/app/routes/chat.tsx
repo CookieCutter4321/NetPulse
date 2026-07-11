@@ -65,7 +65,7 @@ function chat() {
 
   const handleFileUpload = () => {
     var files = uploadFileRef.current?.files
-    // TODO
+    console.log(files)
   }
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
@@ -104,21 +104,23 @@ function chat() {
 
         <CardFooter className="border-t p-4">
           <form onSubmit={handleSend} className="flex w-full items-center space-x-2">
-            <Input
-              type="text"
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1"
-            />
+            <div className="relative flex items-center w-full">
+              <Input
+                type="text"
+                placeholder="Type your message..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                className="flex-1"
+              />
+              <label htmlFor="file-upload" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl font-medium">
+                  +
+              </label>
+              <input id="file-upload" type="file" ref = {uploadFileRef} onChange={handleFileUpload} hidden/>
+            </div>
             <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white">
               Send
             </Button>
           </form>
-             <label htmlFor="file-upload">
-              Upload file
-            </label>
-            <input id="file-upload" title = " " type="file" ref = {uploadFileRef} onChange={handleFileUpload}/>
         </CardFooter>
 
       </Card>
