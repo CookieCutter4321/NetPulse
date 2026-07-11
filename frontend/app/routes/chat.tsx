@@ -115,7 +115,7 @@ function chat() {
               <label htmlFor="file-upload" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl font-medium">
                   +
               </label>
-              <input id="file-upload" type="file" ref = {uploadFileRef} onChange={handleFileUpload} hidden/>
+              <input id="file-upload" type="file" accept=".png,.jpg" ref = {uploadFileRef} onChange={handleFileUpload} hidden/>
             </div>
             <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white">
               Send
