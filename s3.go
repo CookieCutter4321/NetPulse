@@ -95,7 +95,7 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid token", http.StatusBadRequest)
 	}
 
-	fileName := r.URL.Query().Get("name")
+	fileName := scrambleFileName(r.URL.Query().Get("name"))
 	uploadLinkStruct, err := PutObject(r.Context(), fileName, 30)
 
 	if err != nil {
@@ -105,7 +105,7 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		URL:            uploadLinkStruct.URL,
 		Method:         uploadLinkStruct.Method,
 		SignedHeader:   uploadLinkStruct.SignedHeader,
-		FinalPublicUrl: fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, scrambleFileName(fileName)),
+		FinalPublicUrl: fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName),
 	}
 
 	uploadLink, err := json.Marshal(resWrapper)

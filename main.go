@@ -29,9 +29,10 @@ var upgrader = websocket.Upgrader{
 }
 
 type message struct {
-	Id     int64
-	Msg    string
-	Sender string
+	Id      int64
+	Msg     string
+	Sender  string
+	IsMedia bool
 }
 
 var connections = make(map[*websocket.Conn]struct{})
@@ -87,12 +88,14 @@ func chatHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err2)
 			continue
 		}
+
 		connectionsMu.Lock()
 		for currentConn := range connections {
 			payload := message{
-				Id:     time.Now().UnixMilli(),
-				Msg:    msg.Msg,
-				Sender: username,
+				Id:      time.Now().UnixMilli(),
+				Msg:     msg.Msg,
+				Sender:  username,
+				IsMedia: msg.IsMedia,
 			}
 
 			if err := currentConn.WriteJSON(payload); err != nil {

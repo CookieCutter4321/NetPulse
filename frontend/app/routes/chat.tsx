@@ -17,9 +17,9 @@ function chat() {
 
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState([
-    { id: 1, text: "Hey! Welcome to GoChat.", sender: "system" },
-    { id: 2, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", sender: "system" },
-    { id: 3, text: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", sender: "user"}
+    { id: 1, text: "Hey! Welcome to GoChat.", sender: "system", isMedia: false},
+    { id: 2, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", sender: "system", isMedia: false},
+    { id: 3, text: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", sender: "user", isMedia: false}
   ])
   
   const socketRef = useRef<WebSocket | null>(null);
@@ -37,11 +37,10 @@ function chat() {
 
     // Handle incoming msgs
     socket.onmessage = (event) => {
-      console.log("received message");
       const payload = JSON.parse(event.data);
       setMessages((prev) => [
         ...prev, 
-        { id: payload.Id, text: payload.Msg, sender: payload.Sender }
+        { id: payload.Id, text: payload.Msg, sender: payload.Sender, isMedia: payload.IsMedia }
       ]);
     };
 
@@ -54,7 +53,10 @@ function chat() {
       if (!text) return;
 
       if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-        const payload = { Msg: input, isMedia};
+        const payload = { 
+          Msg: text, 
+          IsMedia: isMedia 
+        };
         socketRef.current.send(JSON.stringify(payload));
       }
   };
@@ -95,6 +97,7 @@ function chat() {
     } else {
       alert("S3 rejected the file upload.");
     }
+    sendMessage(presignedData.FinalPublicUrl,true)
   }
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">
@@ -123,7 +126,17 @@ function chat() {
                         : "bg-slate-100 text-slate-800"
                     }`}
                   >
-                    {msg.text}
+                  {msg.isMedia ? (
+                    <img 
+                      src={msg.text} 
+                      alt="Uploaded media" 
+                      className="max-w-full h-auto rounded-md mt-1 cursor-pointer hover:opacity-90 transition-opacity"
+                      loading="lazy" 
+                      onLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })}
+                    />
+                  ) : (
+                    msg.text
+                  )}
                   </div>
               </div>
             </div>
