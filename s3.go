@@ -76,6 +76,8 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("error with encoding json")
 		http.Error(w, "failed to encode json", http.StatusBadRequest)
+		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(uploadLink)
 }
