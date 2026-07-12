@@ -17,10 +17,6 @@ import (
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 )
 
-type Presigner struct {
-	PresignClient *s3.PresignClient
-}
-
 var s3Client *s3.Client
 var bucketName string
 
@@ -40,10 +36,8 @@ func s3_init() {
 
 // PutObject makes a presigned request that can be used to put an object in a bucket.
 // The presigned request is valid for the specified number of seconds.
-func (presigner Presigner) PutObject(
-	ctx context.Context, objectKey string, lifetimeSecs int64) (*v4.PresignedHTTPRequest, error) {
-
-	request, err := presigner.PresignClient.PresignPutObject(ctx, &s3.PutObjectInput{
+func PutObject(ctx context.Context, objectKey string, lifetimeSecs int64) (*v4.PresignedHTTPRequest, error) {
+	request, err := presignClient.PresignPutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(objectKey),
 	}, func(opts *s3.PresignOptions) {
@@ -72,7 +66,7 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uploadLinkStruct, err := presigner.PutObject(r.Context(), string(bodyBytes), 30)
+	uploadLinkStruct, err := PutObject(r.Context(), string(bodyBytes), 30)
 
 	if err != nil {
 		log.Println(err)
