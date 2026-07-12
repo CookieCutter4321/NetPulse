@@ -15,7 +15,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
-	"github.com/awsdocs/aws-doc-sdk-examples/gov2/s3/actions"
 )
 
 type Presigner struct {
@@ -26,7 +25,6 @@ var s3Client *s3.Client
 var bucketName string
 
 var presignClient *s3.PresignClient
-var presigner Presigner
 
 func s3_init() {
 	ctx := context.Background()
@@ -38,7 +36,6 @@ func s3_init() {
 	bucketName = "netpulse"
 
 	presignClient = s3.NewPresignClient(s3Client)
-	presigner = actions.Presigner{presignClient: presignClient}
 }
 
 // PutObject makes a presigned request that can be used to put an object in a bucket.
