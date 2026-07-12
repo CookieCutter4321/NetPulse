@@ -148,6 +148,9 @@ func main() {
 	log.Println("Successfully connected to database")
 	jwtKey = []byte(os.Getenv("JWT_TOKEN"))
 
+	// set up aws S3 access
+	s3_init()
+
 	http.HandleFunc("/api/auth", handleAuth)
 	http.HandleFunc("/api/auth/check", handleAuthCheck)
 	http.HandleFunc("/api/chat", chatHandler)
