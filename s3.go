@@ -60,6 +60,16 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cookie, err := r.Cookie("chat_session")
+	if err != nil {
+		http.Error(w, "cookie error", http.StatusBadRequest)
+	}
+
+	_, err = validateJWT(cookie.Value)
+	if err != nil {
+		http.Error(w, "invalid token", http.StatusBadRequest)
+	}
+
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Failed to read body", http.StatusBadRequest)
