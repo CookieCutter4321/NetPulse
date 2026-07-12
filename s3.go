@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -11,7 +13,9 @@ import (
 
 	"net/http"
 
-	"io"
+	"fmt"
+
+	"path/filepath"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
@@ -19,8 +23,15 @@ import (
 
 var s3Client *s3.Client
 var bucketName string
-
+var region string
 var presignClient *s3.PresignClient
+
+type s3_url struct {
+	URL            string
+	Method         string
+	SignedHeader   http.Header
+	FinalPublicUrl string
+}
 
 func s3_init() {
 	ctx := context.Background()
@@ -30,8 +41,10 @@ func s3_init() {
 	}
 	s3Client = s3.NewFromConfig(sdkConfig)
 	bucketName = "netpulse"
+	region = "us-east-2"
 
 	presignClient = s3.NewPresignClient(s3Client)
+	log.Println("Set up aws S3")
 }
 
 // PutObject makes a presigned request that can be used to put an object in a bucket.
@@ -48,6 +61,18 @@ func PutObject(ctx context.Context, objectKey string, lifetimeSecs int64) (*v4.P
 			bucketName, objectKey, err)
 	}
 	return request, err
+}
+
+func scrambleFileName(s string) string {
+	ext := filepath.Ext(s)
+
+	bytes := make([]byte, 16)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		return s
+	}
+
+	return fmt.Sprintf("%x%s", bytes, strings.ToLower(ext))
 }
 
 // todo: add a rate limiter for calling this endpoint
@@ -70,24 +95,26 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid token", http.StatusBadRequest)
 	}
 
-	bodyBytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read body", http.StatusBadRequest)
-		return
-	}
-
-	uploadLinkStruct, err := PutObject(r.Context(), string(bodyBytes), 30)
+	fileName := r.URL.Query().Get("name")
+	uploadLinkStruct, err := PutObject(r.Context(), fileName, 30)
 
 	if err != nil {
 		log.Println(err)
 	}
+	resWrapper := s3_url{
+		URL:            uploadLinkStruct.URL,
+		Method:         uploadLinkStruct.Method,
+		SignedHeader:   uploadLinkStruct.SignedHeader,
+		FinalPublicUrl: fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, scrambleFileName(fileName)),
+	}
 
-	uploadLink, err := json.Marshal(*uploadLinkStruct)
+	uploadLink, err := json.Marshal(resWrapper)
 	if err != nil {
 		log.Println("error with encoding json")
 		http.Error(w, "failed to encode json", http.StatusBadRequest)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+
 	w.Write(uploadLink)
 }

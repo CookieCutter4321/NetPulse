@@ -50,22 +50,51 @@ function chat() {
     };
   }, []);
 
+  const sendMessage = (text: string = "", isMedia: boolean = false) => { // both really shouldn't be set to anything. it's an XOR
+      if (!text) return;
+
+      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+        const payload = { Msg: input, isMedia};
+        socketRef.current.send(JSON.stringify(payload));
+      }
+  };
+
   const handleSend = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      const payload = { Msg: input };
-      console.log(username)
-      console.log(messages)
-      socketRef.current.send(JSON.stringify(payload));
-      setInput("");
-    }
+    sendMessage(input)
+    setInput("");
   };
 
-  const handleFileUpload = () => {
+  const handleFileUpload = async () => {
     var files = uploadFileRef.current?.files
-    console.log(files)
+
+    if (files == null || files == undefined) {
+      return
+    }
+    var file = files[0]
+    var fileName = file.name
+
+    var presignedData = await fetch(`/api/upload?name=${fileName}`, {
+      method: 'GET'
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error("could not get the signed link")
+      }
+      return response.json()
+    })
+
+    const s3Response = await fetch(presignedData.URL, {
+      method: presignedData.Method,
+      headers: presignedData.SignedHeader,
+      body: file
+    });
+
+    if (s3Response.ok) {
+      alert("File uploaded directly to S3 successfully!");
+    } else {
+      alert("S3 rejected the file upload.");
+    }
   }
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50 p-4">

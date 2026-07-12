@@ -154,6 +154,7 @@ func main() {
 	http.HandleFunc("/api/auth", handleAuth)
 	http.HandleFunc("/api/auth/check", handleAuthCheck)
 	http.HandleFunc("/api/chat", chatHandler)
+	http.HandleFunc("/api/upload", handleUploadFile)
 	log.Println("NetPulse server launching on http://localhost:8080")
 	err = http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
